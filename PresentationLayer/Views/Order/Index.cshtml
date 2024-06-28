@@ -1,0 +1,204 @@
+﻿@using BusinessLogicLayer.Viewmodels.OrderM
+@model OrderMVM
+<div>
+    <div style="padding: 10px;">
+        <div class="main-top">
+            <div class="input-search">
+                <button id="myBtn">Tìm kiếm Sản phẩm</button>
+            </div>
+            <!-- đơn hàng -->
+            
+        </div>
+        <div class="d-flex" style="width: 100%; gap: 10px;">
+            <div style="width: 80%;">
+                <h1>Danh sách sp đã chọn</h1>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th scope="col">Tên Sản Phẩm</th>
+                            <th scope="col">Số Lượng</th>
+                            <th scope="col">Đơn Giá</th>
+                            <th scope="col">Tổng Tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.SelectedProducts)
+                        {
+                            <tr>
+                                <td><button style="border: none; background:none;"><i class="fa-solid fa-trash"></i></button></td>
+                                <td>@item.Name</td>
+                                <td>
+                                    <button style="border: none; background:none;font-size: 20px;">-</button>
+                                    <span>1</span>
+                                    <button style="border: none; background:none;font-size: 20px;">+</button>
+                                </td>
+                                <td>@item.CostPrie</td>
+                                <td>@item.CostPrie </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <form>
+                              
+                <!-- Customer information modal -->
+                
+                <div>
+                    <table class="table">                        
+                    <input type="text" id="txtCustomerName" placeholder="Tên khách hàng">
+                    <input type="text" id="txtCustomerPhone" placeholder="Số điện thoại">
+                    <label for="ship">
+                        Giao hàng
+                        <input type="checkbox" name="ship" id="ship" onchange="toggleShippingAddress()">
+                    </label>
+                    <textarea id="txtShippingAddress" placeholder="Địa chỉ giao hàng" style="display: none;"></textarea>
+                    
+                        <tbody>
+                            <tr>
+                                <td>Tổng tiền:</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>Tiền giảm:</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>Khách phải trả:</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>Khách còn thiếu:</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>Khách thanh toán:</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>Phiếu giảm giá:</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>Ghi chú</td>
+                                <td>0</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                    <button class="primary">Thanh Toán</button>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+
+
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+            <div>
+                <h4 style="font-size: 16px;">Tìm kiếm sản phẩm</h4>
+                <span class="close">
+                    &times;
+                </span>
+            </div>
+            <input width="50%" type="text" name="" id="" placeholder="Nhập tên hoặc mã sản phẩm">
+            <div style="display: flex; justify-content: space-between">
+                <lable>
+                    Màu sắc:
+                    <select name="" id="">
+                        <option value="">Tất cả</option>
+                    </select>
+                </lable>
+                <lable>
+                    Kích cỡ:
+                    <select name="" id="">
+                        <option value="">Tất cả</option>
+                    </select>
+                </lable>               
+            </div>
+
+
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Ảnh</th>
+                        <th scope="col">Mã</th>
+                        <th scope="col">Tên</th>
+                        <th scope="col">Màu sắc</th>
+                        <th scope="col">Kích cỡ</th>
+                        <th scope="col">Giá</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach( var item in Model.lstproduct){
+                    <tr>
+                        <td> <img src="@item.urlImg"  width="50px" height="50px"/> </td>
+                        <td>@item.MaSp</td>
+                        <td>@item.Name</td>
+                        <td>@item.Corlor</td>
+                        <td>@item.Size</td>
+                        <td>@item.CostPrie</td>                       
+                            <td><a href="@Url.Action("AddToSelectedProducts", new { id = item.Id })"><i class="bi bi-plus-circle"></i></a></td>
+
+                        </tr>
+                    }
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+<script>
+
+    // bật tắt modal
+    var modal = document.getElementById("myModal");
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("myBtn");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on the button, open the modal
+    btn.onclick = function () {
+        modal.style.display = "block";
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function () {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
+<script>
+    function toggleShippingAddress() {
+        var checkbox = document.getElementById('ship');
+        var textarea = document.getElementById('txtShippingAddress');
+
+        if (checkbox.checked) {
+            textarea.style.display = 'block';
+        } else {
+            textarea.style.display = 'none';
+        }
+    }
+</script>
+<link rel="stylesheet" href="~/css/order.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+      integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">

@@ -73,6 +73,14 @@ namespace ExternalInterfaceLayer.Controllers
                 return NotFound(new { Message = ex.Message });
             }
         }
+        [HttpGet]
+        [Route("GetAllTQ")]
+        public async Task<IActionResult> GetAllTQ()
+        {
+            var products = await _viewKHServiece.GetAllTQVMs();
+            return Ok(products);
+        }
       
     }
+    
 }

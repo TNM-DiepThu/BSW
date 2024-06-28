@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.Services.Interface;
 using BusinessLogicLayer.Viewmodels;
+using BusinessLogicLayer.Viewmodels.OrderM;
 using BusinessLogicLayer.Viewmodels.ViewKH;
 using CloudinaryDotNet;
 using DataAccessLayer.Application;
@@ -159,6 +160,31 @@ namespace BusinessLogicLayer.Services.Implements
         {
             throw new NotImplementedException();
         }
+        public async Task<List<ProductTQVM>> GetAllTQVMs()
+        {
+
+            var prolist = await _dbcontex.ProductDetails
+         .Include(pd => pd.Options).ThenInclude(o => o.Sizes)
+         .Include(pd => pd.Options).ThenInclude(o => o.Colors)
+         .Include(pd => pd.Options)
+         .Include(pd => pd.Images)
+         .Include(pd => pd.Products)
+         .Select(pd => new ProductTQVM
+         {
+
+             Id = pd.ID,
+             Name = pd.Products.Name,
+             MaSp = pd.KeyCode,
+             CostPrie = pd.Options.FirstOrDefault() != null ? pd.Options.FirstOrDefault().CostPrice : 0,
+             urlImg = pd.Images.FirstOrDefault() != null ? pd.Images.FirstOrDefault().Path : null,
+             Size = pd.Options.FirstOrDefault().Sizes.Name,
+             Corlor = pd.Options.FirstOrDefault().Colors.Name,
+         })
+         .ToListAsync();
+
+            return prolist;
+        }
+
 
         public async Task<ProDetailKH> GetProDetail(Guid id)
         {
