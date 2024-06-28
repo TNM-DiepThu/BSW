@@ -21,10 +21,12 @@ namespace BusinessLogicLayer.Viewmodels.OrderM
     public class ProductTQVM
     {
         public Guid Id { get; set; }
+        public Guid IdOption { get; set; }
         public string Name { get; set; }
         public string MaSp { get; set; }
         public decimal CostPrie { get; set; }
         public string urlImg { get; set; }
+        public int? Quantity { get; set; }
 
         public string? Corlor { get; set; }
         public string? Size { get; set; }

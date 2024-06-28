@@ -54,16 +54,19 @@ namespace BusinessLogicLayer.Services.Implements
                 order.Status = 1;
                 var orderDetailsList = new List<OrderDetails>();
                 decimal totalAmount = 0;
+
                 foreach (var directItem in request.OrderDetailsCreateVM)
                 {
-                    var option = await _dbcontext.Options.FirstOrDefaultAsync(c => c.ID == directItem.IDOptions);
+                    // Tìm IdOption từ IdProduct
+                    var option = await _dbcontext.Options.FirstOrDefaultAsync(o => o.IDProductDetails == directItem.IDOptions);
+
                     if (option != null)
                     {
                         var ordervariant = new OrderDetails()
                         {
                             ID = Guid.NewGuid(),
                             IDOrder = order.ID,
-                            IDOptions = option.ID,
+                            IDOptions = option.ID, // Sử dụng IdOption từ bảng Option
                             UnitPrice = option.RetailPrice,
                             Quantity = directItem.Quantity,
                             TotalAmount = (option.RetailPrice * directItem.Quantity) - ((option.Discount ?? 0) * directItem.Quantity),
@@ -73,20 +76,23 @@ namespace BusinessLogicLayer.Services.Implements
                         };
                         orderDetailsList.Add(ordervariant);
                         totalAmount += (ordervariant.UnitPrice * ordervariant.Quantity) - ((option.Discount ?? 0) * ordervariant.Quantity);
+
+                        // Giảm số lượng sản phẩm trong kho
+                        bool stockUpdated = await CheckAndReduceStock(option.ID, directItem.Quantity);
+                        if (!stockUpdated)
+                        {
+                            await transaction.RollbackAsync();
+                            return false;
+                        }
                     }
                     else
                     {
                         await transaction.RollbackAsync();
-                        return false;
-                    }
-                    bool stockUpdated = await CheckAndReduceStock(directItem.IDOptions, directItem.Quantity);
-                    if (!stockUpdated)
-                    {
-                        await transaction.RollbackAsync();
-                        return false;
+                        return false; // Nếu không tìm thấy Option, rollback và trả về false
                     }
                 }
 
+                // Xử lý voucher nếu có
                 if (!string.IsNullOrWhiteSpace(request.VoucherCode))
                 {
                     var voucher = await _dbcontext.Voucher.FirstOrDefaultAsync(v => v.Code == request.VoucherCode);
@@ -106,8 +112,8 @@ namespace BusinessLogicLayer.Services.Implements
                     }
                     _dbcontext.Voucher.Update(voucher);
                 }
-                decimal minimumTotal = 5000;
 
+                decimal minimumTotal = 5000;
                 if (totalAmount < minimumTotal)
                 {
                     order.TotalAmount = minimumTotal;
@@ -116,12 +122,12 @@ namespace BusinessLogicLayer.Services.Implements
                 {
                     order.TotalAmount = totalAmount;
                 }
-                order.TotalAmount = totalAmount;
 
+                // Lưu đơn hàng và chi tiết đơn hàng vào database
                 await _dbcontext.Order.AddAsync(order);
                 _dbcontext.OrderDetails.AddRange(orderDetailsList);
-                await _dbcontext.SaveChangesAsync();
 
+                // Lưu lịch sử đơn hàng
                 var orderHistory = new OrderHistory
                 {
                     ID = Guid.NewGuid(),
@@ -139,9 +145,10 @@ namespace BusinessLogicLayer.Services.Implements
                 };
                 await _dbcontext.OrderHistory.AddAsync(orderHistory);
 
+                // Lưu thay đổi vào database
                 await _dbcontext.SaveChangesAsync();
-
                 await transaction.CommitAsync();
+
                 return true;
             }
             catch (Exception)
