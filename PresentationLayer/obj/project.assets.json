@@ -12165,23 +12165,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\nhamt\\.nuget\\packages\\": {},
+    "C:\\Users\\admin\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\BeyoungSportWear\\PresentationLayer\\PresentationLayer.csproj",
+      "projectUniqueName": "C:\\Users\\admin\\OneDrive\\Máy tính\\BeyoungSportWear\\PresentationLayer\\PresentationLayer.csproj",
       "projectName": "PresentationLayer",
-      "projectPath": "D:\\BeyoungSportWear\\PresentationLayer\\PresentationLayer.csproj",
-      "packagesPath": "C:\\Users\\nhamt\\.nuget\\packages\\",
-      "outputPath": "D:\\BeyoungSportWear\\PresentationLayer\\obj\\",
+      "projectPath": "C:\\Users\\admin\\OneDrive\\Máy tính\\BeyoungSportWear\\PresentationLayer\\PresentationLayer.csproj",
+      "packagesPath": "C:\\Users\\admin\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\admin\\OneDrive\\Máy tính\\BeyoungSportWear\\PresentationLayer\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\nhamt\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\admin\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -12197,8 +12197,8 @@
         "net7.0": {
           "targetAlias": "net7.0",
           "projectReferences": {
-            "D:\\BeyoungSportWear\\BusinessLogicLayer\\BusinessLogicLayer.csproj": {
-              "projectPath": "D:\\BeyoungSportWear\\BusinessLogicLayer\\BusinessLogicLayer.csproj"
+            "C:\\Users\\admin\\OneDrive\\Máy tính\\BeyoungSportWear\\BusinessLogicLayer\\BusinessLogicLayer.csproj": {
+              "projectPath": "C:\\Users\\admin\\OneDrive\\Máy tính\\BeyoungSportWear\\BusinessLogicLayer\\BusinessLogicLayer.csproj"
             }
           }
         }
@@ -12207,6 +12207,11 @@
         "warnAsError": [
           "NU1605"
         ]
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
       }
     },
     "frameworks": {
@@ -12241,7 +12246,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.101\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300\\RuntimeIdentifierGraph.json"
       }
     }
   }

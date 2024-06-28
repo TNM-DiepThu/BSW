@@ -92,9 +92,29 @@ namespace PresentationLayer.Controllers
                 var handler = new JwtSecurityTokenHandler();
                 var token = handler.ReadJwtToken(jwtToken);
                 var userId = token.Claims.FirstOrDefault(c => c.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value;
+
+                var selectedProductsJson = HttpContext.Session.GetString("SelectedProducts");
+                var selectedProducts = string.IsNullOrEmpty(selectedProductsJson)
+                    ? new List<ProductTQVM>()
+                    : JsonConvert.DeserializeObject<List<ProductTQVM>>(selectedProductsJson);
+
+                if (selectedProducts == null || !selectedProducts.Any())
+                {
+                    return BadRequest("Không có sản phẩm nào được chọn.");
+                }
+
+                var orderDetails = selectedProducts.Select(p => new OrderDetailsCreateVM
+                {
+                    CreateBy = userId,
+                    IDOptions = p.Id,
+                    Quantity = p.Quantity ?? 1, // Assuming default quantity is 1 if not provided
+                    UnitPrice = p.CostPrie,
+                    Discount = 0 // Add your discount logic if any
+                }).ToList();
+
                 var request = new OrderCreateVM
                 {
-                    CreateBy = userId.ToString(),
+                    CreateBy = userId,
                     CustomerName = order.CreateVM.CustomerName,
                     CustomerPhone = order.CreateVM.CustomerPhone,
                     CustomerEmail = order.CreateVM.CustomerEmail,
@@ -108,35 +128,28 @@ namespace PresentationLayer.Controllers
                     ShippingMethods = order.CreateVM.ShippingMethods,
                     OrderStatus = order.CreateVM.OrderStatus,
                     Status = order.CreateVM.Status,
-                    OrderDetailsCreateVM = new List<OrderDetailsCreateVM> {
-                        new OrderDetailsCreateVM
-                        {
-                            CreateBy = userId.ToString(),
-                            IDOptions = order.CreateVMDetails.IDOptions,
-                            Quantity = order.CreateVMDetails.Quantity,
-                            UnitPrice = order.CreateVMDetails.UnitPrice,
-                            Discount = order.CreateVMDetails.Discount,
-                        }
-
-                    }
+                    OrderDetailsCreateVM = orderDetails
                 };
-                var json = JsonConvert.SerializeObject(order);
+
+                var json = JsonConvert.SerializeObject(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
                 var response = await _httpClient.PostAsync("https://localhost:7241/api/Order/create", content);
                 if (response.IsSuccessStatusCode)
                 {
-                    return View();
+                    // Clear selected products after successful order creation
+                    HttpContext.Session.Remove("SelectedProducts");
+                    return RedirectToAction("OrderSuccess"); // Or any success view you prefer
                 }
                 else
                 {
-                    return View();
+                    return View("OrderError"); // Or any error view you prefer
                 }
-
             }
             catch (Exception ex)
             {
                 return View("OrderError");
             }
         }
+
     }
 }
