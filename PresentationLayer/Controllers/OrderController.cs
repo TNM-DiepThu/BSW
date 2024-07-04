@@ -37,6 +37,13 @@ namespace PresentationLayer.Controllers
                 var selectedProducts = string.IsNullOrEmpty(selectedProductsJson)
                     ? new List<ProductTQVM>()
                     : JsonConvert.DeserializeObject<List<ProductTQVM>>(selectedProductsJson);
+                foreach (var product in selectedProducts)
+                {
+                    if (product.Quantity == null || product.Quantity <= 0)
+                    {
+                        product.Quantity = 1;
+                    }
+                }
 
                 var orderMVM = new OrderMVM
                 {
