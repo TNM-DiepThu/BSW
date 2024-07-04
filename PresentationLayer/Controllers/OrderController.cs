@@ -150,6 +150,23 @@ namespace PresentationLayer.Controllers
                 return View("OrderError");
             }
         }
+        public IActionResult UpdateProductQuantity(Guid id, int quantity)
+        {
+            var selectedProductsJson = HttpContext.Session.GetString("SelectedProducts");
+            var selectedProducts = string.IsNullOrEmpty(selectedProductsJson)
+                ? new List<ProductTQVM>()
+                : JsonConvert.DeserializeObject<List<ProductTQVM>>(selectedProductsJson);
+
+            var productToUpdate = selectedProducts.FirstOrDefault(p => p.Id == id);
+
+            if (productToUpdate != null)
+            {
+                productToUpdate.Quantity = quantity;
+                HttpContext.Session.SetString("SelectedProducts", JsonConvert.SerializeObject(selectedProducts));
+            }
+
+            return RedirectToAction("Index");
+        }
 
     }
 }

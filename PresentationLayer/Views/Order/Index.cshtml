@@ -15,6 +15,7 @@
                     <thead>
                         <tr>
                             <th></th>
+                            <th> Ảnh</th>
                             <th scope="col">Tên Sản Phẩm</th>
                             <th scope="col">Số Lượng</th>
                             <th scope="col">Đơn Giá</th>
@@ -25,6 +26,7 @@
                         @foreach (var item in Model.SelectedProducts)
                         {
                             <tr>
+                                <td><img src="@item.urlImg" alt="Alternate Text" /></td>
                                 <td>
                                     <button style="border: none; background:none;">
                                         <i class="fa-solid fa-trash"></i>
@@ -32,10 +34,13 @@
                                 </td>
                                 <td>@item.Name</td>
                                 <td>
-                                    <input type="number" min="1" id="quantity-@item.Id" value="1" onchange="updateTotal('@item.Id', '@item.CostPrie')">
+                                    <form asp-action="UpdateProductQuantity" method="post" id="quantity-form-@item.Id">
+                                        <input type="hidden" name="id" value="@item.Id" />
+                                        <input type="number" min="1" name="quantity" id="quantity-@item.Id" value="@item.Quantity" onchange="document.getElementById('quantity-form-@item.Id').submit();" />
+                                    </form>
                                 </td>
                                 <td>@item.CostPrie</td>
-                                <td id="total-@item.Id">@item.CostPrie</td>
+                                <td id="total-@item.Id">@item.CostPrie * @item.Quantity</td>
                             </tr>
                         }
                     </tbody>
@@ -66,7 +71,7 @@
                                 <input asp-for="@Model.CreateVM.ShippingAddress" class="form-control" />
                                 <span asp-validation-for="@Model.CreateVM.ShippingAddress" class="text-danger"></span>
                             </div>
-                            <div class="form-group"> 
+                            <div class="form-group">
                                 <label asp-for="@Model.CreateVM.TotalAmount" class="control-label"></label>
                                 <input asp-for="@Model.CreateVM.TotalAmount" class="form-control" />
                                 <span asp-validation-for="@Model.CreateVM.TotalAmount" class="text-danger"></span>
@@ -192,17 +197,17 @@
     }
     function updateGrandTotal() {
         var grandTotal = 0;
-        @if (Model.SelectedProducts != null)
+    @if (Model.SelectedProducts != null)
+    {
+        foreach (var item in Model.SelectedProducts)
         {
-            foreach (var item in Model.SelectedProducts)
-            {
-                <text>
-                    var totalElement = document.getElementById('total-@item.Id');
-                    grandTotal += parseFloat(totalElement.innerText);
-                </text>
-            }
+            <text>
+                                var totalElement = document.getElementById('total-@item.Id');
+                grandTotal += parseFloat(totalElement.innerText);
+            </text>
         }
-        document.getElementById('grandTotal').innerText = grandTotal.toFixed(2); 
+    }
+            document.getElementById('grandTotal').innerText = grandTotal.toFixed(2);
     }
 </script>
 <link rel="stylesheet" href="~/css/order.css">
@@ -213,26 +218,26 @@
       integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <script>
     function updateTotal(productId, costPrice) {
-    var quantityElement = document.getElementById('quantity-' + productId);
-    var totalElement = document.getElementById('total-' + productId);
-    var quantity = parseInt(quantityElement.value);
-    var total = quantity * parseFloat(costPrice);
-    totalElement.innerText = total.toFixed(2); // Định dạng hiển thị số thập phân
-    updateGrandTotal(); // Gọi hàm cập nhật tổng tiền chung
-}
+        var quantityElement = document.getElementById('quantity-' + productId);
+        var totalElement = document.getElementById('total-' + productId);
+        var quantity = parseInt(quantityElement.value);
+        var total = quantity * parseFloat(costPrice);
+        totalElement.innerText = total.toFixed(2); // Định dạng hiển thị số thập phân
+        updateGrandTotal(); // Gọi hàm cập nhật tổng tiền chung
+    }
 
-function updateGrandTotal() {
-    var grandTotal = 0;
+    function updateGrandTotal() {
+        var grandTotal = 0;
     @if (Model.SelectedProducts != null)
     {
         foreach (var item in Model.SelectedProducts)
         {
             <text>
-                var totalElement = document.getElementById('total-@item.Id');
+                            var totalElement = document.getElementById('total-@item.Id');
                 grandTotal += parseFloat(totalElement.innerText);
             </text>
         }
     }
-    document.getElementById('grandTotal').innerText = grandTotal.toFixed(2);
-}
+            document.getElementById('grandTotal').innerText = grandTotal.toFixed(2);
+    }
 </script>
