@@ -14,8 +14,8 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th></th>
                             <th> Ảnh</th>
+                            <th></th>                           
                             <th scope="col">Tên Sản Phẩm</th>
                             <th scope="col">Số Lượng</th>
                             <th scope="col">Đơn Giá</th>
@@ -28,9 +28,11 @@
                             <tr>
                                 <td><img src="@item.urlImg" alt="Alternate Text" /></td>
                                 <td>
-                                    <button style="border: none; background:none;">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
+                                    <form asp-action="RemoveFromSelectedProducts" asp-route-id="@item.Id" method="post">
+                                        <button type="submit" style="border: none; background:none;">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </form>
                                 </td>
                                 <td>@item.Name</td>
                                 <td>
@@ -109,48 +111,51 @@
                 <h4 style="font-size: 16px;">Tìm kiếm sản phẩm</h4>
                 <span class="close">&times;</span>
             </div>
-            <input width="50%" type="text" name="" id="" placeholder="Nhập tên hoặc mã sản phẩm">
-            <div style="display: flex; justify-content: space-between">
-                <label>
-                    Màu sắc:
-                    <select name="" id="">
-                        <option value="">Tất cả</option>
-                    </select>
-                </label>
-                <label>
-                    Kích cỡ:
-                    <select name="" id="">
-                        <option value="">Tất cả</option>
-                    </select>
-                </label>
-            </div>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Ảnh</th>
-                        <th scope="col">Mã</th>
-                        <th scope="col">Tên</th>
-                        <th scope="col">Màu sắc</th>
-                        <th scope="col">Kích cỡ</th>
-                        <th scope="col">Giá</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.lstproduct)
-                    {
+            <form id="searchForm" method="get" asp-action="SearchProduct" asp-controller="Order">
+                <input width="50%" type="text" name="search" id="searchInput" placeholder="Nhập tên hoặc mã sản phẩm">
+                <div style="display: flex; justify-content: space-between">
+                    <label>
+                        Màu sắc:
+                        <select name="color" id="colorSelect">
+                            <option value="">Tất cả</option>                           
+                        </select>
+                    </label>
+                    <label>
+                        Kích cỡ:
+                        <select name="size" id="sizeSelect">
+                            <option value="">Tất cả</option>
+                        </select>
+                    </label>
+                </div>
+            </form>
+            <iframe name="searchFrame" id="searchFrame" style="display: none;"></iframe>
+                <table class="table">
+                    <thead>
                         <tr>
-                            <td><img src="@item.urlImg" width="50px" height="50px" /></td>
-                            <td>@item.MaSp</td>
-                            <td>@item.Name</td>
-                            <td>@item.Corlor</td>
-                            <td>@item.Size</td>
-                            <td>@item.CostPrie</td>
-                            <td><a href="@Url.Action("AddToSelectedProducts", new { id = item.Id })"><i class="bi bi-plus-circle"></i></a></td>
+                            <th scope="col">Ảnh</th>
+                            <th scope="col">Mã</th>
+                            <th scope="col">Tên</th>
+                            <th scope="col">Màu sắc</th>
+                            <th scope="col">Kích cỡ</th>
+                            <th scope="col">Giá</th>
+                            <th></th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.lstproduct)
+                        {
+                            <tr>
+                                <td><img src="@item.urlImg" width="50px" height="50px" /></td>
+                                <td>@item.MaSp</td>
+                                <td>@item.Name</td>
+                                <td>@item.Corlor</td>
+                                <td>@item.Size</td>
+                                <td>@item.CostPrie</td>
+                                <td><a href="@Url.Action("AddToSelectedProducts", new { id = item.Id })"><i class="bi bi-plus-circle"></i></a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
         </div>
     </div>
 </div>
@@ -158,24 +163,59 @@
     var modal = document.getElementById("myModal");
     var btn = document.getElementById("myBtn");
     var span = document.getElementsByClassName("close")[0];
+    function saveModalState() {
+        var modalOpen = modal.style.display === "block";
+        localStorage.setItem("modalOpen", modalOpen);
+    }
+
+    // Mở modal khi nhấn nút
     btn.onclick = function () {
         modal.style.display = "block";
+        saveModalState();
     }
+
+    // Đóng modal khi nhấn nút đóng
     span.onclick = function () {
         modal.style.display = "none";
+        saveModalState();
     }
+
+    // Đóng modal khi click bên ngoài modal
     window.onclick = function (event) {
         if (event.target == modal) {
             modal.style.display = "none";
+            saveModalState();
         }
     }
+
+    // Khôi phục trạng thái của modal sau khi tải lại trang
+    document.addEventListener("DOMContentLoaded", function () {
+        var modalOpen = localStorage.getItem("modalOpen");
+        if (modalOpen === "true") {
+            modal.style.display = "block";
+        } else {
+            modal.style.display = "none";
+        }
+    });
+
+
+    document.getElementById('searchForm').addEventListener('submit', function () {
+        document.getElementById('searchFrame').style.display = 'block';
+        modal.style.display = "none";
+    });
+
+
+    document.getElementById('searchFrame').onload = function () {
+        document.getElementById('searchFrame').style.display = 'block';
+    };
+
     function updateTotal(productId, costPrice) {
         var quantityElement = document.getElementById('quantity-' + productId);
         var totalElement = document.getElementById('total-' + productId);
         var quantity = parseInt(quantityElement.value);
         var total = quantity * parseFloat(costPrice);
-        totalElement.innerText = total.toFixed(2); // Định dạng hiển thị số thập phân
-        updateGrandTotal(); // Gọi hàm cập nhật tổng tiền chung
+        totalElement.innerText = total.toFixed(2); 
+        updateGrandTotal(); 
     }
     function updateGrandTotal() {
         var grandTotal = 0;
@@ -184,7 +224,7 @@
         foreach (var item in Model.SelectedProducts)
         {
             <text>
-                                var totalElement = document.getElementById('total-@item.Id');
+                                            var totalElement = document.getElementById('total-@item.Id');
                 grandTotal += parseFloat(totalElement.innerText);
             </text>
         }

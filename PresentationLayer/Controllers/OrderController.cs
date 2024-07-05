@@ -61,7 +61,53 @@ namespace PresentationLayer.Controllers
                 return StatusCode((int)response.StatusCode);
             }
         }
+       
+        public async Task<IActionResult> SearchProduct(string search, string color, string size)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var response = await client.GetAsync($"https://localhost:7241/api/OrderTQ/SeachProduct?search={search}");
 
+            if (response.IsSuccessStatusCode)
+            {
+                var productsJson = await response.Content.ReadAsStringAsync();
+                var products = JsonConvert.DeserializeObject<List<ProductTQVM>>(productsJson);
+
+                if (!string.IsNullOrEmpty(color))
+                {
+                    products = products.Where(p => p.Corlor == color).ToList();
+                }
+
+                if (!string.IsNullOrEmpty(size))
+                {
+                    products = products.Where(p => p.Size == size).ToList();
+                }
+
+                var selectedProductsJson = HttpContext.Session.GetString("SelectedProducts");
+                var selectedProducts = string.IsNullOrEmpty(selectedProductsJson)
+                    ? new List<ProductTQVM>()
+                    : JsonConvert.DeserializeObject<List<ProductTQVM>>(selectedProductsJson);
+                foreach (var product in selectedProducts)
+                {
+                    if (product.Quantity == null || product.Quantity <= 0)
+                    {
+                        product.Quantity = 1;
+                    }
+                }
+
+                var orderMVM = new OrderMVM
+                {
+                    lstproduct = products,
+                    SelectedProducts = selectedProducts
+                };
+
+                TempData["Products"] = JsonConvert.SerializeObject(products);
+                return View("Index", orderMVM);
+            }
+            else
+            {
+                return StatusCode((int)response.StatusCode, response.Content.ReadAsStringAsync().Result);
+            }
+        }
         public IActionResult AddToSelectedProducts(Guid id)
         {
             var selectedProductsJson = HttpContext.Session.GetString("SelectedProducts");
@@ -145,7 +191,7 @@ namespace PresentationLayer.Controllers
                 {
                     // Clear selected products after successful order creation
                     HttpContext.Session.Remove("SelectedProducts");
-                    return RedirectToAction("OrderSuccess"); // Or any success view you prefer
+                    return RedirectToAction("Index"); // Or any success view you prefer
                 }
                 else
                 {
@@ -172,6 +218,23 @@ namespace PresentationLayer.Controllers
                 HttpContext.Session.SetString("SelectedProducts", JsonConvert.SerializeObject(selectedProducts));
             }
 
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult RemoveFromSelectedProducts(Guid id)
+        {
+            var selectedProductsJson = HttpContext.Session.GetString("SelectedProducts");
+            var selectedProducts = string.IsNullOrEmpty(selectedProductsJson)
+                ? new List<ProductTQVM>()
+                : JsonConvert.DeserializeObject<List<ProductTQVM>>(selectedProductsJson);
+
+            var productToRemove = selectedProducts.FirstOrDefault(p => p.Id == id);
+            if (productToRemove != null)
+            {
+                selectedProducts.Remove(productToRemove);
+            }
+
+            HttpContext.Session.SetString("SelectedProducts", JsonConvert.SerializeObject(selectedProducts));
             return RedirectToAction("Index");
         }
 

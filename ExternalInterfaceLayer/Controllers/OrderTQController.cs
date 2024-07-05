@@ -15,7 +15,7 @@ namespace ExternalInterfaceLayer.Controllers
             _order = orderTQ;
         }
         [HttpGet]
-        [Route("SeachOrder")]
+        [Route("SeachProduct")]
         public async Task<IActionResult> Search(string search)
         {
             var products = await _order.GetProductTQVMs(search);
