@@ -180,7 +180,6 @@ namespace PresentationLayer.Controllers
                     PaymentStatus = order.CreateVM.PaymentStatus,
                     ShippingMethods = order.CreateVM.ShippingMethods,
                     OrderStatus = order.CreateVM.OrderStatus,
-                    Status = order.CreateVM.Status,
                     OrderDetailsCreateVM = orderDetails
                 };
 
@@ -196,6 +195,7 @@ namespace PresentationLayer.Controllers
                 else
                 {
                     return View("OrderError"); // Or any error view you prefer
+
                 }
             }
             catch (Exception ex)

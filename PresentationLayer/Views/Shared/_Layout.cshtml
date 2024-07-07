@@ -84,6 +84,13 @@
                                         <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;">Đăng xuất</button>
                                     </form>
                                 </li>
+                                
+                                    <li>
+                                        <form asp-action="Index" asp-controller="Order" method="post" style="display: inline;">
+                                            <button type="submit" style="background: none; border: none; padding: 0; cursor: pointer;">Bán tại quầy</button>
+                                        </form>
+                                    </li>
+                                
                             }
                         </ul>
                     </div>
@@ -163,11 +170,11 @@
                                 Về chúng tôi
                             </a>
                         </li>
-                        <li>
+                       @*  <li>
                             <a asp-area="" asp-controller="Order" asp-action="Index" asp-route-a="0">
-                                Test
+                                Bán tại quầy
                             </a>
-                        </li>
+                        </li> *@
 
 
                         <!-- BEGIN TOP SEARCH -->

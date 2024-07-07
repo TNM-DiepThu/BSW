@@ -53,54 +53,70 @@
                     <table class="table">
                         <tbody>
                             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <input type="checkbox" id="enableDelivery" onchange="toggleDeliveryForm()"> Giao hàng 
                             <div class="form-group">
-                                <label asp-for="@Model.CreateVM.CustomerName" class="control-label"></label>
+                                <label class="control-label"> Tên khách hàng</label>
                                 <input asp-for="@Model.CreateVM.CustomerName" class="form-control" />
                                 <span asp-validation-for="@Model.CreateVM.CustomerName" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="@Model.CreateVM.CustomerPhone" class="control-label"></label>
+                                <label  class="control-label"> Số điện thoại khách hàng</label>
                                 <input asp-for="@Model.CreateVM.CustomerPhone" class="form-control" />
                                 <span asp-validation-for="@Model.CreateVM.CustomerPhone" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="@Model.CreateVM.CustomerEmail" class="control-label"></label>
+                                <label class=" control-label">Email khách hàng</label>
                                 <input asp-for="@Model.CreateVM.CustomerEmail" class="form-control" />
                                 <span asp-validation-for="@Model.CreateVM.CustomerEmail" class="text-danger"></span>
                             </div>
-                            <div class="form-group">
-                                <label asp-for="@Model.CreateVM.ShippingAddress" class="control-label"></label>
-                                <input asp-for="@Model.CreateVM.ShippingAddress" class="form-control" />
+                            <div class="form-group" id="deliveryFormGroup" style="display: none;">
+                                <div class="css_select_div">
+                                    <select class="css_select" id="tinh" name="tinh" title="Chọn Tỉnh Thành" onchange="updateShippingAddress()">
+                                        <option value="0">Tỉnh Thành</option>
+                                        <!-- Các option khác của Tỉnh -->
+                                    </select>
+                                    <select class="css_select" id="quan" name="quan" title="Chọn Quận Huyện" onchange="updateShippingAddress()">
+                                        <option value="0">Quận Huyện</option>
+                                        <!-- Các option khác của Quận -->
+                                    </select>
+                                    <select class="css_select" id="phuong" name="phuong" title="Chọn Phường Xã" onchange="updateShippingAddress()">
+                                        <option value="0">Phường Xã</option>
+                                        <!-- Các option khác của Phường -->
+                                    </select>
+                                </div>
+                                <label class="control-label">Địa chỉ cụ thể</label>
+                                <input type="text" id="diaChiCụThe" class="form-control" oninput="updateShippingAddress()" />
+
+                                <label class="control-label">Địa chỉ giao</label>
+                                <textarea asp-for="@Model.CreateVM.ShippingAddress" id="shippingAddress" class="form-control" readonly rows="3"></textarea>
                                 <span asp-validation-for="@Model.CreateVM.ShippingAddress" class="text-danger"></span>
                             </div>
-                           
-                            
                             <div class="form-group">
-                                <label asp-for="@Model.CreateVM.VoucherCode" class="control-label"></label>
+                                <label class="control-label">Mã giảm giá</label>
                                 <input asp-for="@Model.CreateVM.VoucherCode" class="form-control" />
                                 <span asp-validation-for="@Model.CreateVM.VoucherCode" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="@Model.CreateVM.Notes" class="control-label"></label>
+                                <label class="control-label">Ghi chú</label>
                                 <input asp-for="@Model.CreateVM.Notes" class="form-control" />
                                 <span asp-validation-for="@Model.CreateVM.Notes" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="@Model.CreateVM.PaymentMethods" class="control-label"></label>
+                                <label class="control-label">Phương thức thanh toán</label>
                                 <input asp-for="@Model.CreateVM.PaymentMethods" class="form-control" />
                                 <span asp-validation-for="@Model.CreateVM.PaymentMethods" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <label asp-for="@Model.CreateVM.TotalAmount" class="control-label"></label>
+                                <label class="control-label">Tổng tiền</label>
                                 <input asp-for="@Model.CreateVM.TotalAmount" class="form-control" />
                                 <span asp-validation-for="@Model.CreateVM.TotalAmount" class="text-danger"></span>
                             </div>
                             <div class="form-group">
-                                <input type="submit" value="Create" class="btn btn-primary" />
+                                <input class ="primary" type="submit" value="Thanh Toán" class="btn btn-primary" />
                             </div>
                         </tbody>
                     </table>
-                    <button class="primary">Thanh Toán</button>
+                    
                 </div>
             </form>
         </div>
@@ -261,5 +277,86 @@
         }
     }
             document.getElementById('grandTotal').innerText = grandTotal.toFixed(2);
+    }
+</script>
+<script src="https://esgoo.net/scripts/jquery.js"></script>
+<style type="text/css">
+    .css_select_div {
+        text-align: center;
+    }
+
+    .css_select {
+        display: inline-table;
+        width: 25%;
+        padding: 5px;
+        margin: 5px 2%;
+        border: solid 1px #686868;
+        border-radius: 5px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        //Lấy tỉnh thành
+        $.getJSON('https://esgoo.net/api-tinhthanh/1/0.htm', function (data_tinh) {
+            if (data_tinh.error == 0) {
+                $.each(data_tinh.data, function (key_tinh, val_tinh) {
+                    $("#tinh").append('<option value="' + val_tinh.id + '">' + val_tinh.full_name + '</option>');
+                });
+                $("#tinh").change(function (e) {
+                    var idtinh = $(this).val();
+                    //Lấy quận huyện
+                    $.getJSON('https://esgoo.net/api-tinhthanh/2/' + idtinh + '.htm', function (data_quan) {
+                        if (data_quan.error == 0) {
+                            $("#quan").html('<option value="0">Quận Huyện</option>');
+                            $("#phuong").html('<option value="0">Phường Xã</option>');
+                            $.each(data_quan.data, function (key_quan, val_quan) {
+                                $("#quan").append('<option value="' + val_quan.id + '">' + val_quan.full_name + '</option>');
+                            });
+                            //Lấy phường xã
+                            $("#quan").change(function (e) {
+                                var idquan = $(this).val();
+                                $.getJSON('https://esgoo.net/api-tinhthanh/3/' + idquan + '.htm', function (data_phuong) {
+                                    if (data_phuong.error == 0) {
+                                        $("#phuong").html('<option value="0">Phường Xã</option>');
+                                        $.each(data_phuong.data, function (key_phuong, val_phuong) {
+                                            $("#phuong").append('<option value="' + val_phuong.id + '">' + val_phuong.full_name + '</option>');
+                                        });
+                                    }
+                                });
+                            });
+
+                        }
+                    });
+                });
+
+            }
+        });
+    });
+</script>
+<script>
+    function updateShippingAddress() {
+        var tinh = document.getElementById('tinh').options[document.getElementById('tinh').selectedIndex].text;
+        var quan = document.getElementById('quan').options[document.getElementById('quan').selectedIndex].text;
+        var phuong = document.getElementById('phuong').options[document.getElementById('phuong').selectedIndex].text;
+        var diaChiCụThe = document.getElementById('diaChiCụThe').value;
+
+        if (tinh === "Tỉnh Thành") tinh = "";
+        if (quan === "Quận Huyện") quan = "";
+        if (phuong === "Phường Xã") phuong = "";
+
+        var shippingAddress = [tinh, quan, phuong, diaChiCụThe].filter(Boolean).join(" - ");
+        document.getElementById('shippingAddress').value = shippingAddress;
+    }
+</script>
+<script>
+    function toggleDeliveryForm() {
+        var checkbox = document.getElementById("enableDelivery");
+        var deliveryFormGroup = document.getElementById("deliveryFormGroup");
+
+        if (checkbox.checked) {
+            deliveryFormGroup.style.display = "block";
+        } else {
+            deliveryFormGroup.style.display = "none";
+        }
     }
 </script>
