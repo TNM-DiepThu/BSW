@@ -37,6 +37,7 @@ namespace PresentationLayer.Controllers
                 var selectedProducts = string.IsNullOrEmpty(selectedProductsJson)
                     ? new List<ProductTQVM>()
                     : JsonConvert.DeserializeObject<List<ProductTQVM>>(selectedProductsJson);
+
                 foreach (var product in selectedProducts)
                 {
                     if (product.Quantity == null || product.Quantity <= 0)
@@ -44,13 +45,17 @@ namespace PresentationLayer.Controllers
                         product.Quantity = 1;
                     }
                 }
+                decimal totalAmount = selectedProducts.Sum(p => p.CostPrie * (p.Quantity ?? 1));
 
                 var orderMVM = new OrderMVM
                 {
                     lstproduct = products,
-                    SelectedProducts = selectedProducts
-                };
-
+                    SelectedProducts = selectedProducts,
+                    CreateVM = new OrderCreateVM
+                    {
+                        TotalAmount = totalAmount
+                    }
+                };              
                 // Lưu danh sách sản phẩm vào TempData để sử dụng trong AddToSelectedProducts
                 TempData["Products"] = JsonConvert.SerializeObject(products);
                 return View(orderMVM);
@@ -164,7 +169,10 @@ namespace PresentationLayer.Controllers
                     UnitPrice = p.CostPrie,
                     Discount = 0 // Add your discount logic if any
                 }).ToList();
-
+                if (string.IsNullOrEmpty(order.CreateVM.ShippingAddress))
+                {
+                    order.CreateVM.ShippingAddress = "bán tại quầy";
+                }
                 var request = new OrderCreateVM
                 {
                     CreateBy = userId,

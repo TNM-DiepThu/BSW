@@ -1,4 +1,5 @@
 ﻿@using BusinessLogicLayer.Viewmodels.OrderM
+@using Newtonsoft.Json
 @model OrderMVM
 
 <div>
@@ -90,6 +91,11 @@
                                 <label class="control-label">Địa chỉ giao</label>
                                 <textarea asp-for="@Model.CreateVM.ShippingAddress" id="shippingAddress" class="form-control" readonly rows="3"></textarea>
                                 <span asp-validation-for="@Model.CreateVM.ShippingAddress" class="text-danger"></span>
+                                <div class="form-group">
+                                    <label class="control-label">Phí vận chuyển</label>
+                                    <input asp-for="CreateVM.Cotsts" id="shippingCost" class="form-control" oninput="updateTotal()" />
+                                    <span asp-validation-for="CreateVM.Cotsts" class="text-danger"></span>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label class="control-label">Mã giảm giá</label>
@@ -103,20 +109,22 @@
                             </div>
                             <div class="form-group">
                                 <label class="control-label">Phương thức thanh toán</label>
-                                <input asp-for="@Model.CreateVM.PaymentMethods" class="form-control" />
+                                <select asp-for="@Model.CreateVM.PaymentMethods" class="form-control">
+                                    <option value="Thanh toán online">Thanh toán online</option>
+                                    <option value="Thanh toán tại quầy">Thanh toán tại quầy</option>
+                                </select>
                                 <span asp-validation-for="@Model.CreateVM.PaymentMethods" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label class="control-label">Tổng tiền</label>
-                                <input asp-for="@Model.CreateVM.TotalAmount" class="form-control" />
+                                <input asp-for="@Model.CreateVM.TotalAmount" id="grandTotal" class="form-control" readonly />
                                 <span asp-validation-for="@Model.CreateVM.TotalAmount" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <input class ="primary" type="submit" value="Thanh Toán" class="btn btn-primary" />
                             </div>
                         </tbody>
-                    </table>
-                    
+                    </table>                    
                 </div>
             </form>
         </div>
@@ -359,4 +367,89 @@
             deliveryFormGroup.style.display = "none";
         }
     }
+</script>
+<script>
+    function updateTotal() {
+        var total = 0;
+
+        // Tính tổng tiền từ các sản phẩm đã chọn
+        var rows = document.querySelectorAll("table.table-bordered tbody tr");
+        rows.forEach(function (row) {
+            var quantity = parseInt(row.querySelector("input[name^='quantity']").value);
+            var unitPrice = parseFloat(row.querySelector("td:nth-child(5)").innerText);
+            var subtotal = quantity * unitPrice;
+            total += subtotal;
+        });
+
+        // Cộng thêm phí vận chuyển
+        var shippingCost = parseFloat(document.getElementById("shippingCost").value) || 0;
+        total += shippingCost;
+
+        // Hiển thị tổng tiền đã tính được
+        document.getElementById("grandTotal").value = total.toFixed(2);
+    }
+
+    function toggleDeliveryForm() {
+        var deliveryFormGroup = document.getElementById("deliveryFormGroup");
+        var enableDelivery = document.getElementById("enableDelivery").checked;
+
+        if (enableDelivery) {
+            deliveryFormGroup.style.display = "block";
+        } else {
+            deliveryFormGroup.style.display = "none";
+            document.getElementById("shippingAddress").value = "";
+            updateShippingAddress();
+        }
+    }
+
+    function updateShippingAddress() {
+        var province = document.getElementById("tinh").value;
+        var district = document.getElementById("quan").value;
+        var ward = document.getElementById("phuong").value;
+        var specificAddress = document.getElementById("diaChiCụThe").value;
+
+        var address = "";
+
+        if (province !== "0") {
+            address += province;
+        }
+
+        if (district !== "0") {
+            address += ", " + district;
+        }
+
+        if (ward !== "0") {
+            address += ", " + ward;
+        }
+
+        if (specificAddress.trim() !== "") {
+            address += ", " + specificAddress;
+        }
+
+        document.getElementById("shippingAddress").value = address;
+    }
+
+    // Tính toán tổng tiền ban đầu khi trang được tải
+    window.onload = function () {
+        updateTotal();
+    };
+
+    // Đóng modal khi nhấp vào nút đóng
+    var closeButtons = document.querySelectorAll(".close");
+    closeButtons.forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            var modal = btn.closest(".modal");
+            modal.style.display = "none";
+        });
+    });
+
+    // Đóng modal khi nhấp vào bên ngoài nội dung modal
+    window.onclick = function (event) {
+        var modals = document.querySelectorAll(".modal");
+        modals.forEach(function (modal) {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+    };
 </script>

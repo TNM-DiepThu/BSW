@@ -118,7 +118,7 @@ namespace PresentationLayer.Controllers
             }
 
             TempData["Error"] = "Unable to retrieve cart details. Please try again later.";
-            return RedirectToAction("Error", "Home");
+            return View(new List<GetCartDetailVM>());
         }
 
         [HttpPost]
@@ -154,7 +154,7 @@ namespace PresentationLayer.Controllers
                 // Log the exception or handle it as needed
                 ViewBag.Message = $"An error occurred: {ex.Message}";
             }
-            return RedirectToAction("GetAllCart", "Cart");
+            return RedirectToAction("GetAllCart", "CartM");
         }
     }
 }
