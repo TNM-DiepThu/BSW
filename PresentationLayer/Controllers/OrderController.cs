@@ -2,6 +2,7 @@
 using BusinessLogicLayer.Viewmodels.OrderDetails;
 using BusinessLogicLayer.Viewmodels.OrderM;
 using BusinessLogicLayer.Viewmodels.ViewKH;
+using CloudinaryDotNet;
 using DataAccessLayer.Entity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Extensions;
@@ -65,6 +66,20 @@ namespace PresentationLayer.Controllers
             else
             {
                 return StatusCode((int)response.StatusCode);
+            }
+        }
+        public async Task<IActionResult> GetAllOrder()
+        {
+            var response = await _httpClient.GetAsync("https://localhost:7241/api/OrderTQ/GetAllOrder");
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var orders = JsonConvert.DeserializeObject<List<OrderVM>>(responseContent);
+                return View(orders);  
+            }
+            else
+            {
+                return View(new List<OrderVM>());
             }
         }
 

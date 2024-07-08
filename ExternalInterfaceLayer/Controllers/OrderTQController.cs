@@ -10,9 +10,11 @@ namespace ExternalInterfaceLayer.Controllers
     public class OrderTQController : ControllerBase
     {
         private readonly IOrderTQServiece _order;
-        public OrderTQController(IOrderTQServiece orderTQ)
+        private readonly IOrderService _orderService;
+        public OrderTQController(IOrderTQServiece orderTQ,IOrderService orderService)
         {
             _order = orderTQ;
+            _orderService = orderService;
         }
         [HttpGet]
         [Route("SeachProduct")]
@@ -20,6 +22,13 @@ namespace ExternalInterfaceLayer.Controllers
         {
             var products = await _order.GetProductTQVMs(search);
             return Ok(products);
+        }
+        [HttpGet]
+        [Route("GetAllOrder")]
+        public async Task<IActionResult> GetAll()
+        {
+            var order = await _orderService.GetAllAsync();
+            return Ok(order);   
         }
     }
 }
