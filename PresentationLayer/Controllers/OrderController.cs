@@ -8,6 +8,7 @@ using Microsoft.OpenApi.Extensions;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
+using static DataAccessLayer.Entity.Base.EnumBase;
 
 namespace PresentationLayer.Controllers
 {
@@ -55,7 +56,7 @@ namespace PresentationLayer.Controllers
                     {
                         TotalAmount = totalAmount
                     }
-                };              
+                };
                 // Lưu danh sách sản phẩm vào TempData để sử dụng trong AddToSelectedProducts
                 TempData["Products"] = JsonConvert.SerializeObject(products);
                 return View(orderMVM);
@@ -66,7 +67,7 @@ namespace PresentationLayer.Controllers
                 return StatusCode((int)response.StatusCode);
             }
         }
-       
+
         public async Task<IActionResult> SearchProduct(string search, string color, string size)
         {
             var client = _httpClientFactory.CreateClient();
@@ -171,8 +172,11 @@ namespace PresentationLayer.Controllers
                 }).ToList();
                 if (string.IsNullOrEmpty(order.CreateVM.ShippingAddress))
                 {
-                    order.CreateVM.ShippingAddress = "bán tại quầy";
+                    order.CreateVM.ShippingAddress = "None";
                 }
+                OrderStatus orderStatus = string.IsNullOrEmpty(order.CreateVM.ShippingAddress) || order.CreateVM.ShippingAddress == "None"
+    ? OrderStatus.Delivered
+    : OrderStatus.Pending;
                 var request = new OrderCreateVM
                 {
                     CreateBy = userId,
@@ -187,7 +191,7 @@ namespace PresentationLayer.Controllers
                     PaymentMethods = order.CreateVM.PaymentMethods,
                     PaymentStatus = order.CreateVM.PaymentStatus,
                     ShippingMethods = order.CreateVM.ShippingMethods,
-                    OrderStatus = order.CreateVM.OrderStatus,
+                    OrderStatus = orderStatus,
                     OrderDetailsCreateVM = orderDetails
                 };
 

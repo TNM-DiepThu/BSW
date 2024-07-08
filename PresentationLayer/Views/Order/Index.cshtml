@@ -27,7 +27,7 @@
                         @foreach (var item in Model.SelectedProducts)
                         {
                             <tr>
-                                <td><img src="@item.urlImg" alt="Alternate Text" /></td>
+                                <td><img src="@item.urlImg" alt="Alternate Text" / width="50px" height="50px"></td>
                                 <td>
                                     <form asp-action="RemoveFromSelectedProducts" asp-route-id="@item.Id" method="post">
                                         <button type="submit" style="border: none; background:none;">
@@ -109,13 +109,30 @@
                             </div>
                             <div class="form-group">
                                 <label class="control-label">Phương thức thanh toán</label>
-                                <select asp-for="@Model.CreateVM.PaymentMethods" class="form-control">
-                                    <option value="Thanh toán online">Thanh toán online</option>
-                                    <option value="Thanh toán tại quầy">Thanh toán tại quầy</option>
+                                <select asp-for="@Model.CreateVM.PaymentMethods" id="paymentMethods" class="form-control" onchange="togglePaymentInputs()">
+                                    <option value="TienMat">Tiền mặt</option>
+                                    <option value="ChuyenKhoan">Chuyển khoản</option>
+                                    <option value="Both">Cả hai</option>
                                 </select>
                                 <span asp-validation-for="@Model.CreateVM.PaymentMethods" class="text-danger"></span>
                             </div>
+                            <div id="cashPayment" style="display: none;">
+                                <div class="form-group">
+                                    <label class="control-label">Số tiền trả (VNĐ)</label>
+                                    <input type="number" id="cashAmount" class="form-control" onchange="updatePaidAmount()" />
+                                </div>
+                            </div>
+                            <div id="bankTransferPayment" style="display: none;">
+                                <div class="form-group">
+                                    <label class="control-label">Số tiền chuyển khoản (VNĐ)</label>
+                                    <input type="number" id="bankTransferAmount" class="form-control" onchange="updatePaidAmount()" />
+                                </div>
+                            </div>
                             <div class="form-group">
+                                <div class="form-group">
+                                    <label class="control-label">Đã thanh toán</label>
+                                    <span id="paidAmount">0.00</span>
+                                </div>
                                 <label class="control-label">Tổng tiền</label>
                                 <input asp-for="@Model.CreateVM.TotalAmount" id="grandTotal" class="form-control" readonly />
                                 <span asp-validation-for="@Model.CreateVM.TotalAmount" class="text-danger"></span>
@@ -452,4 +469,52 @@
             }
         });
     };
+</script>
+<script>
+    function togglePaymentInputs() {
+        var paymentMethods = document.getElementById("paymentMethods");
+        var selectedOption = paymentMethods.options[paymentMethods.selectedIndex].value;
+        var cashPayment = document.getElementById("cashPayment");
+        var bankTransferPayment = document.getElementById("bankTransferPayment");
+
+        // Ẩn các phương thức thanh toán
+        cashPayment.style.display = "none";
+        bankTransferPayment.style.display = "none";
+
+        // Hiển thị phương thức thanh toán tương ứng
+        if (selectedOption === "TienMat" || selectedOption === "Both") {
+            cashPayment.style.display = "block";
+        }
+        if (selectedOption === "ChuyenKhoan" || selectedOption === "Both") {
+            bankTransferPayment.style.display = "block";
+        }
+
+        // Cập nhật số tiền đã thanh toán khi thay đổi phương thức
+        updatePaidAmount();
+    }
+
+    function updatePaidAmount() {
+        var cashAmount = parseFloat(document.getElementById("cashAmount").value) || 0;
+        var bankTransferAmount = parseFloat(document.getElementById("bankTransferAmount").value) || 0;
+
+        var totalAmount = parseFloat(document.getElementById("grandTotal").value) || 0;
+        var paidAmount = cashAmount + bankTransferAmount;
+
+        // Hiển thị số tiền đã thanh toán
+        document.getElementById("paidAmount").textContent = paidAmount.toFixed(2);
+
+        // Kiểm tra và hiển thị thông báo nếu số tiền thanh toán không đủ
+        var paymentStatus = document.getElementById("paymentStatus");
+        if (paidAmount >= totalAmount) {
+            paymentStatus.textContent = "Đã đủ số tiền thanh toán.";
+            document.getElementById("btnSubmit").disabled = false; // Cho phép thanh toán
+        } else {
+            var remainingAmount = totalAmount - paidAmount;
+            paymentStatus.textContent = "Khách hàng còn thiếu số tiền: " + remainingAmount.toFixed(2);
+            document.getElementById("btnSubmit").disabled = true; // Không cho phép thanh toán
+        }
+    }
+
+    // Gọi hàm togglePaymentInputs khi tải trang để hiển thị các input ban đầu
+    togglePaymentInputs();
 </script>

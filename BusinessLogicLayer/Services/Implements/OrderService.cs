@@ -42,7 +42,7 @@ namespace BusinessLogicLayer.Services.Implements
                 order.CustomerName = request.CustomerName;
                 order.CustomerPhone = request.CustomerPhone;
                 order.CustomerEmail = request.CustomerEmail;
-                order.OrderStatus = OrderStatus.Pending;
+                order.OrderStatus = request.OrderStatus;
                 order.ShipDate = request.ShipDate;
                 order.ShippingAddress = request.ShippingAddress;
                 order.ShippingAddressLine2 = request.ShippingAddressLine2;
@@ -51,7 +51,9 @@ namespace BusinessLogicLayer.Services.Implements
                 order.PaymentMethods = request.PaymentMethods;
                 order.PaymentStatus = request.PaymentStatus;
                 order.ShippingMethods = request.ShippingMethods;
+                order.HexCode = request.GenerateHexCode();
                 order.Status = 1;
+                order.TotalAmount = request.TotalAmount;
                 var orderDetailsList = new List<OrderDetails>();
                 decimal totalAmount = 0;
 
