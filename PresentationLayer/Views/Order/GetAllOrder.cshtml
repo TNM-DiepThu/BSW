@@ -1,149 +1,72 @@
 ﻿@model IEnumerable<BusinessLogicLayer.Viewmodels.Order.OrderVM>
+@using static DataAccessLayer.Entity.Base.EnumBase.OrderStatus
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ID)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreateDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.VoucherCode)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.HexCode)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IDUser)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustomerName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustomerPhone)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CustomerEmail)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.FullNameUser)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ShippingAddress)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ShippingAddressLine2)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ShipDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TotalAmount)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cotsts)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Notes)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TrackingCheck)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PaymentMethod)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PaymentStatus)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ShippingMethod)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.OrderStatus)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
+            <th>Ngày tạo</th>
+            <th>Mã hóa đơn</th>
+            <th>SDT</th>
+            <th>email</th>
+            <th>Người nhận</th>
+            <th>Địa chỉ</th>
+            <th>Ngày giao</th>
+            <th>Tổng tiền</th>
+            <th>Ghi chú</th>
+            <th>Trạng thái đơn hàng</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ID)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreateDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.VoucherCode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.HexCode)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IDUser)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustomerName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustomerPhone)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CustomerEmail)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FullNameUser)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ShippingAddress)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ShippingAddressLine2)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ShipDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TotalAmount)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Cotsts)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Notes)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TrackingCheck)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PaymentMethod)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PaymentStatus)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ShippingMethod)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OrderStatus)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.CreateDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.HexCode)</td>
+                <td>@Html.DisplayFor(modelItem => item.CustomerPhone)</td>
+                <td>@Html.DisplayFor(modelItem => item.CustomerEmail)</td>
+                <td>@Html.DisplayFor(modelItem => item.CustomerName)</td>
+                <td>@Html.DisplayFor(modelItem => item.ShippingAddress)</td>
+                <td>@Html.DisplayFor(modelItem => item.ShipDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.TotalAmount)</td>
+                <td>@Html.DisplayFor(modelItem => item.Notes)</td>
+                <td>
+                        @if (item.OrderStatus == Pending)
+                        {
+                            <text>Chưa giải quyết</text>
+                        }
+                        else if (item.OrderStatus == Processing)
+                        {
+                            <text>Đang xử lý</text>
+                        }
+                        else if (item.OrderStatus == Shipped)
+                        {
+                            <text>Đã vận chuyển</text>
+                        }
+                        else if (item.OrderStatus == Delivered)
+                        {
+                            <text>Đã giao hàng</text>
+                        }
+                        else if (item.OrderStatus == Cancelled)
+                        {
+                            <text>Đã hủy</text>
+                        }
+                        else if (item.OrderStatus == Returned)
+                        {
+                            <text>Trả lại</text>
+                        }
+                        else
+                        {
+                            <text>Không xác định</text>
+                        }
+                </td>
+                    
+                <td>
+                    <a href="@Url.Action("OrderDetail", "Order", new { id = item.ID })">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

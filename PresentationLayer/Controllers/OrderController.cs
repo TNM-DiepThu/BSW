@@ -75,7 +75,7 @@ namespace PresentationLayer.Controllers
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
                 var orders = JsonConvert.DeserializeObject<List<OrderVM>>(responseContent);
-                return View(orders);  
+                return View(orders);
             }
             else
             {
@@ -264,6 +264,48 @@ namespace PresentationLayer.Controllers
             HttpContext.Session.SetString("SelectedProducts", JsonConvert.SerializeObject(selectedProducts));
             return RedirectToAction("Index");
         }
+        public async Task<IActionResult> OrderDetail(Guid id)
+        {
+            var response = await _httpClient.GetAsync($"https://localhost:7241/api/OrderTQ/GetById/{id}");
+            if (!response.IsSuccessStatusCode)
+            {
+               
+                return StatusCode((int)response.StatusCode, response.ReasonPhrase);
+            }
 
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var order = JsonConvert.DeserializeObject<OrderVM>(responseContent);
+
+            return View(order);
+        }
+        public async Task<IActionResult> UpdateOrderStatus(Guid id, OrderStatus status)
+        {
+            try
+            {
+                // Chuẩn bị đường dẫn API với các tham số truy vấn
+                var apiUrl = $"https://localhost:7241/api/OrderTQ/UpdateOrderStatus?id={id}&status={status}";
+
+                // Gửi request POST đến API
+                var response = await _httpClient.PostAsync(apiUrl, null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Xử lý khi cập nhật thành công
+                    return RedirectToAction("OrderDetail", new { id });
+                }
+                else
+                {
+                    // Xử lý khi cập nhật không thành công
+                    TempData["ErrorMessage"] = "Cập nhật trạng thái đơn hàng không thành công";
+                    return RedirectToAction("OrderDetail", new { id });
+                }
+            }
+            catch (Exception ex)
+            {
+                // Xử lý khi có lỗi xảy ra
+                TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
+                return RedirectToAction("OrderDetail", new { id });
+            }
+        }
     }
 }

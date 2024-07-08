@@ -77,7 +77,7 @@
                                     </div>
                                     <h3><a asp-controller="Home" asp-action="ProductDetail">@product.Name</a></h3>
                                     <div class="pi-price">$@product.CostPrie</div>
-                                    <a asp-action="AddToCart" asp-controller="CartM" method="post" class="btn btn-default add2cart">Add to cart</a>
+                                    <a asp-action="AddToCart" asp-controller="CartM" asp-route-id="@product.Id" method="post" class="btn btn-default add2cart">Add to cart</a>
 
                                 </div>
                             </div>

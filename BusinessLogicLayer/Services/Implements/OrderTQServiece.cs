@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BusinessLogicLayer.Services.Interface;
+using BusinessLogicLayer.Viewmodels.Order;
 using BusinessLogicLayer.Viewmodels.OrderM;
 using CloudinaryDotNet;
 using DataAccessLayer.Application;
@@ -13,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static DataAccessLayer.Entity.Base.EnumBase;
 
 namespace BusinessLogicLayer.Services.Implements
 {
@@ -30,7 +32,7 @@ namespace BusinessLogicLayer.Services.Implements
             _cloudinary = cloudinary;
             _userManager = userManager;
             _dbcontex = applicationDBContext;
-                _mapper = mapper;
+            _mapper = mapper;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -42,7 +44,7 @@ namespace BusinessLogicLayer.Services.Implements
        .Include(pd => pd.Options)
        .Include(pd => pd.Images)
        .Include(pd => pd.Products)
-       .Where(pd => pd.Products.Name.Contains(seach)) 
+       .Where(pd => pd.Products.Name.Contains(seach))
        .Select(pd => new ProductTQVM
        {
            Id = pd.ID,
@@ -57,5 +59,23 @@ namespace BusinessLogicLayer.Services.Implements
 
             return prolist;
         }
+
+        public async Task<bool> UpdateOrderStatusAsync(Guid ID, OrderStatus orderStatus)
+        {
+            var order = await _dbcontex.Order.FirstOrDefaultAsync(o => o.ID == ID);
+
+            if (order == null || order.TrackingCheck)
+            {
+                return false;
+            }
+
+            order.ModifiedDate = DateTime.Now;
+            order.OrderStatus = orderStatus;
+
+            _dbcontex.Order.Update(order);
+            await _dbcontex.SaveChangesAsync();
+            return true;
+        }
+
     }
 }

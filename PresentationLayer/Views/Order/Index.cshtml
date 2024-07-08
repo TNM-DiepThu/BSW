@@ -419,32 +419,7 @@
         }
     }
 
-    function updateShippingAddress() {
-        var province = document.getElementById("tinh").value;
-        var district = document.getElementById("quan").value;
-        var ward = document.getElementById("phuong").value;
-        var specificAddress = document.getElementById("diaChiCụThe").value;
-
-        var address = "";
-
-        if (province !== "0") {
-            address += province;
-        }
-
-        if (district !== "0") {
-            address += ", " + district;
-        }
-
-        if (ward !== "0") {
-            address += ", " + ward;
-        }
-
-        if (specificAddress.trim() !== "") {
-            address += ", " + specificAddress;
-        }
-
-        document.getElementById("shippingAddress").value = address;
-    }
+    
 
     // Tính toán tổng tiền ban đầu khi trang được tải
     window.onload = function () {
